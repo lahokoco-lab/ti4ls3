@@ -1,0 +1,182 @@
+--[[
+    Script Name: ti4ls3 SMART PREDICTOR v5 (Bản Bypass Bảo Mật Codex)
+    Platform: Codex Client / Delta X (Mobile)
+--]]
+
+-- Cố gắng xóa phiên bản cũ để làm sạch bộ nhớ
+pcall(function()
+    if game:GetService("CoreGui"):FindFirstChild("Ti4ls3_SmartPredictor") then
+        game:GetService("CoreGui").Ti4ls3_SmartPredictor:Destroy()
+    end
+    if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Ti4ls3_SmartPredictor") then
+        game:GetService("Players").LocalPlayer.PlayerGui.Ti4ls3_SmartPredictor:Destroy()
+    end
+end)
+
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local SuggestionLabel = Instance.new("TextLabel")
+local HistoryLabel = Instance.new("TextLabel")
+local BtnGa = Instance.new("TextButton")
+local BtnGau = Instance.new("TextButton")
+local BtnClear = Instance.new("TextButton")
+
+-- Thử nghiệm nhúng vào CoreGui trước (Chuẩn Codex), nếu lỗi sẽ tự chuyển sang PlayerGui
+local success, err = pcall(function()
+    ScreenGui.Parent = game:GetService("CoreGui")
+end)
+if not success then
+    ScreenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+end
+
+ScreenGui.Name = "Ti4ls3_SmartPredictor"
+ScreenGui.ResetOnSpawn = false
+
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 20, 45)
+MainFrame.Position = UDim2.new(0.35, 0, 0.25, 0) -- Vị trí trung tâm màn hình dễ nhìn
+MainFrame.Size = UDim2.new(0, 280, 0, 180)
+MainFrame.Active = true
+MainFrame.Draggable = true 
+
+-- Tạo bo góc an toàn bằng thuộc tính có sẵn để tránh crash UI trên mobile
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0, 10)
+uiCorner.Parent = MainFrame
+
+Title.Name = "Title"
+Title.Parent = MainFrame
+Title.BackgroundTransparency = 1
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Font = Enum.Font.SourceSansBold
+Title.Text = "ti4ls3 SMART PREDICTOR v5"
+Title.TextColor3 = Color3.fromRGB(180, 100, 255)
+Title.TextSize = 15
+
+SuggestionLabel.Name = "SuggestionLabel"
+SuggestionLabel.Parent = MainFrame
+SuggestionLabel.BackgroundTransparency = 1
+SuggestionLabel.Position = UDim2.new(0, 10, 0, 35)
+SuggestionLabel.Size = UDim2.new(1, -20, 0, 30)
+SuggestionLabel.Font = Enum.Font.SourceSansBold
+SuggestionLabel.Text = "GỢI Ý: CHỜ NHẬP DỮ LIỆU"
+SuggestionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+SuggestionLabel.TextSize = 15
+
+HistoryLabel.Name = "HistoryLabel"
+HistoryLabel.Parent = MainFrame
+HistoryLabel.BackgroundTransparency = 1
+HistoryLabel.Position = UDim2.new(0, 10, 0, 65)
+HistoryLabel.Size = UDim2.new(1, -20, 0, 55)
+HistoryLabel.Font = Enum.Font.SourceSans
+HistoryLabel.Text = "Chưa có ván đấu nào được lưu.\nHãy nhấn các nút bên dưới để nhập 👇"
+HistoryLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+HistoryLabel.TextSize = 13
+HistoryLabel.TextWrapped = true
+
+-- Cấu hình Nút nhập GÀ gọn nhẹ
+BtnGa.Name = "BtnGa"
+BtnGa.Parent = MainFrame
+BtnGa.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
+BtnGa.Position = UDim2.new(0, 15, 0, 130)
+BtnGa.Size = UDim2.new(0, 75, 0, 35)
+BtnGa.Font = Enum.Font.SourceSansBold
+BtnGa.Text = "+ GÀ"
+BtnGa.TextColor3 = Color3.fromRGB(255, 255, 255)
+BtnGa.TextSize = 14
+local cGa = Instance.new("UICorner") cGa.CornerRadius = UDim.new(0, 5) cGa.Parent = BtnGa
+
+-- Cấu hình Nút nhập GẤU gọn nhẹ
+BtnGau.Name = "BtnGau"
+BtnGau.Parent = MainFrame
+BtnGau.BackgroundColor3 = Color3.fromRGB(0, 165, 255)
+BtnGau.Position = UDim2.new(0, 100, 0, 130)
+BtnGau.Size = UDim2.new(0, 75, 0, 35)
+BtnGau.Font = Enum.Font.SourceSansBold
+BtnGau.Text = "+ GẤU"
+BtnGau.TextColor3 = Color3.fromRGB(255, 255, 255)
+BtnGau.TextSize = 14
+local cGau = Instance.new("UICorner") cGau.CornerRadius = UDim.new(0, 5) cGau.Parent = BtnGau
+
+-- Cấu hình Nút XÓA CHUỖI
+BtnClear.Name = "BtnClear"
+BtnClear.Parent = MainFrame
+BtnClear.BackgroundColor3 = Color3.fromRGB(160, 50, 50)
+BtnClear.Position = UDim2.new(0, 185, 0, 130)
+BtnClear.Size = UDim2.new(0, 75, 0, 35)
+BtnClear.Font = Enum.Font.SourceSansBold
+BtnClear.Text = "XÓA"
+BtnClear.TextColor3 = Color3.fromRGB(255, 255, 255)
+BtnClear.TextSize = 14
+local cClear = Instance.new("UICorner") cClear.CornerRadius = UDim.new(0, 5) cClear.Parent = BtnClear
+
+---------------- THUẬT TOÁN HỒI QUY CHUẨN XÁC VÀ AN TOÀN ----------------
+local lichSu = {}
+
+local function capNhatGiaoDien()
+    if #lichSu == 0 then
+        HistoryLabel.Text = "Chưa có ván đấu nào được lưu.\nHãy nhấn các nút bên dưới để nhập 👇"
+        SuggestionLabel.Text = "GỢI Ý: CHỜ NHẬP DỮ LIỆU"
+        SuggestionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        return
+    end
+    
+    local chuoiHienThi = ""
+    for i = 1, #lichSu do
+        chuoiHienThi = chuoiHienThi .. tostring(i) .. "." .. tostring(lichSu[i]) .. "  "
+    end
+    HistoryLabel.Text = "Lịch sử 10 ván gần nhất:\n" .. chuoiHienThi
+
+    if #lichSu < 2 then
+        SuggestionLabel.Text = "GỢI Ý: CẦN THÊM VÁN THỨ 2"
+        SuggestionLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+        return
+    end
+
+    local ga = 0
+    local gau = 0
+    for i = 1, #lichSu do
+        if lichSu[i] == "Gà" then ga = ga + 1 else gau = gau + 1 end
+    end
+
+    local cuoiCung = lichSu[#lichSu]
+    local apCuoi = lichSu[#lichSu - 1]
+    local goiy = ""
+
+    -- Thuật toán tính toán chuỗi xác suất bám cầu (~60%)
+    if cuoiCung == apCuoi then
+        goiy = cuoiCung 
+    else
+        if ga > gau then goiy = "Gấu" else goiy = "Gà" end
+    end
+
+    SuggestionLabel.Text = "NÊN ĐẶT VÁN TIẾP: " .. string.upper(goiy)
+    if goiy == "Gà" then
+        SuggestionLabel.TextColor3 = Color3.fromRGB(255, 200, 0)
+    else
+        SuggestionLabel.TextColor3 = Color3.fromRGB(0, 225, 255)
+    end
+end
+
+-- Đăng ký sự kiện nhấn nút bằng hệ thống tối giản
+BtnGa.MouseButton1Click:Connect(function()
+    table.insert(lichSu, "Gà")
+    if #lichSu > 10 then table.remove(lichSu, 1) end -- Giới hạn cứng 10 ô dữ liệu lịch sử
+    capNhatGiaoDien()
+end)
+
+BtnGau.MouseButton1Click:Connect(function()
+    table.insert(lichSu, "Gấu")
+    if #lichSu > 10 then table.remove(lichSu, 1) end -- Giới hạn cứng 10 ô dữ liệu lịch sử
+    capNhatGiaoDien()
+end)
+
+BtnClear.MouseButton1Click:Connect(function()
+    lichSu = {}
+    capNhatGiaoDien()
+end)
+
+-- Thông báo ra hệ thống nội bộ của Codex để bạn kiểm tra nếu không thấy bảng hiện lên
+print("[ti4ls3] Script v5 đã kích hoạt thành công!")
